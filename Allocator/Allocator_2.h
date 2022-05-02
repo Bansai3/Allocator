@@ -119,8 +119,11 @@ public:
 		Node<Queue<Block<void>>>* pt = blocks.start;
 		while (pt != nullptr)
 		{
+			if (pt->value.start != nullptr)
+			{
 			if (N * sizeof(T) <= pt->value.start->value.size)
 				break;
+			}
 			pt = pt->next;
 		}
 
