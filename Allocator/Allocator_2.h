@@ -81,36 +81,29 @@ public:
 
 	pointer allocate(int N)
 	{
-		try
-		{
-			Node<Queue<Block<void>>>* pt = blocks.start;
+		Node<Queue<Block<void>>>* pt = blocks.start;
 
-			while (pt != nullptr)
-			{
-			if (pt->value.start != nullptr)
-			{
-			if (N * sizeof(T) <= pt->value.start->value.size)
-			{
-				Node<Block<void>>* p = pt->value.start;
-				while (p != nullptr)
-				{
-					if (p->value.state == false)
-					{
-						p->value.state = true;
-						return static_cast<pointer>(p->value.p);
-					}
-					p = p->next;
-				}
-			}
-			}
-			pt = pt->next;
-			}
-			throw "No such block";
-		}
-		catch (const char* message)
+		while (pt != nullptr)
 		{
-			std::cout << message;
+		if (pt->value.start != nullptr)
+		{
+		if (N * sizeof(T) <= pt->value.start->value.size)
+		{
+			Node<Block<void>>* p = pt->value.start;
+			while (p != nullptr)
+			{
+				if (p->value.state == false)
+				{
+					p->value.state = true;
+					return static_cast<pointer>(p->value.p);
+				}
+				p = p->next;
+			}
 		}
+		}
+		pt = pt->next;
+		}
+		throw std::invalid_argument("No such block");
 	}
 
 	template<typename U>
@@ -172,9 +165,28 @@ public:
 		}
 		pt = pt->next;
 	}
-	~Allocator() = default;
+
+	~Allocator()
+	{
+		Node<Queue<Block<void>>>* ptr = blocks.start;
+
+		while (ptr)
+		{
+			if (ptr->value.start != nullptr)
+			{
+			Node<Block<void>>* ptr_2 = ptr->value.start;
+			while (ptr_2)
+			{
+				if (ptr_2->value.state == false)
+					free(ptr_2->value.p);
+
+				ptr_2 = ptr_2->next;
+			}
+			}
+			ptr = ptr->next;
+		}
+
+	}
 };
-
-
 
 
